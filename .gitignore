@@ -1,0 +1,7 @@
+/MDK-ARM/*
+/build/*
+*.jdebug*
+/.vscode/*
+/user/
+!*.uvoptx
+!*.uvprojx
