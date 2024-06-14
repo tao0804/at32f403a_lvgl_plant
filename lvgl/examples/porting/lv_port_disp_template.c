@@ -11,9 +11,9 @@
  *********************/
 #include "lv_port_disp_template.h"
 #include <stdbool.h>
-// tao:add include lcd.h?
-//#include "lcd.h"
-
+#include "st7789.h"
+#include "lv_mcu_driver.h"
+ 
 /*********************
  *      DEFINES
  *********************/
@@ -141,6 +141,8 @@ void lv_port_disp_init(void)
 static void disp_init(void)
 {
     /*You code here*/
+    st7789_init();
+    lv_mcu_spi_io_init();
 }
 
 volatile bool disp_flush_enabled = true;
@@ -160,7 +162,9 @@ void disp_disable_update(void)
 }
 
 /*Flush the content of the internal buffer the specific area on the display
+ *将内部缓冲区的内容刷新到显示器的特定区域 
  *You can use DMA or any hardware acceleration to do this operation in the background but
+ *可以使用DMA或任何硬件加速在后台执行此操作
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
@@ -173,8 +177,7 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
             for(x = area->x1; x <= area->x2; x++) {
                 /*Put a pixel to the display. For example:*/
                 /*put_px(x, y, *color_p)*/
-                // tao:刷新函数,用于图形填充,第一种:不断画点
-                GUI_DrawPoint(x, y, color_p->full);
+                st7789_flush(disp_drv, area, color_p);
                 color_p++;
             }
         }

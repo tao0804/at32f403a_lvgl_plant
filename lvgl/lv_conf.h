@@ -30,7 +30,9 @@
 #define LV_COLOR_DEPTH 16
 
 /*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
-#define LV_COLOR_16_SWAP 0
+// tao:控制是否执行字节交换
+// tao:spi有大小端问题,比如,原始顺序是 0xRR GG,LV_COLOR_16_SWAP为0,则传输后顺序 0xGG RR
+#define LV_COLOR_16_SWAP 1
 
 /*Enable features to draw on transparent background.
  *It's required if opa, and transform_* style properties are used.
