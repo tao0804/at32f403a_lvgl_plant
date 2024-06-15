@@ -1,53 +1,19 @@
-/**
-  **************************************************************************
-  * @file     main.c
-  * @brief    main program
-  **************************************************************************
-  *                       Copyright notice & Disclaimer
-  *
-  * The software Board Support Package (BSP) that is made available to
-  * download from Artery official website is the copyrighted work of Artery.
-  * Artery authorizes customers to use, copy, and distribute the BSP
-  * software and its related documentation for the purpose of design and
-  * development in conjunction with Artery microcontrollers. Use of the
-  * software is governed by this copyright notice and the following disclaimer.
-  *
-  * THIS SOFTWARE IS PROVIDED ON "AS IS" BASIS WITHOUT WARRANTIES,
-  * GUARANTEES OR REPRESENTATIONS OF ANY KIND. ARTERY EXPRESSLY DISCLAIMS,
-  * TO THE FULLEST EXTENT PERMITTED BY LAW, ALL EXPRESS, IMPLIED OR
-  * STATUTORY OR OTHER WARRANTIES, GUARANTEES OR REPRESENTATIONS,
-  * INCLUDING BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
-  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
-  *
-  **************************************************************************
-  */
-
-//#include "at32f403a_407_board.h"
+#include "my_delay.h"
 #include "at32f403a_407_clock.h"
+#include "lv_port_disp_template.h"
 
-
-
-/**
-  * @brief  main function.
-  * @param  none
-  * @retval none
-  */
 int main(void)
 {
-  system_clock_config();
-
-
-
-  while(1)
-  {
-
-  }
+	system_clock_config();
+	delay_init();
+	delay_ms(500);
+	lv_init(); /* lvgl 系统初始化 */
+	lv_port_disp_init(); /* lvgl 显示接口初始化,放在 lv_init()的后面 */
+	lv_obj_t *label = lv_label_create(lv_scr_act());
+	lv_label_set_text(label, "Hello LVGL  :- (");
+	lv_obj_center(label);
+	while(1)
+	{
+		lv_timer_handler();
+	}
 }
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */

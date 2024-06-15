@@ -1,26 +1,57 @@
 #include "lv_mcu_driver.h"
 #include "st7789.h"
 #include "at32f403a_407_clock.h"
-#include "at32f403a_407_board.h"
+#include "my_delay.h"
 
+
+
+/*************SPI配置函数*******************
+SCL空闲时低电平,第一个上升沿采样,模拟SPI
+SPI模块发送函数
+**************************************/
+
+// tao:CPOL=0,CPHA=0
+// tao:在第二个跳变沿(下降沿)改变数据,发送完重新置空闲状态(低),lcd驱动依赖
+static void SPI_SendByte(unsigned char byte)				//向液晶屏写一个8位数据
+{
+	unsigned char counter;
+	for(counter=0;counter<8;counter++)
+	{ 
+		SPI_SCK_0;		  
+		if((byte&0x80)==0)
+		{
+			SPI_SDA_0;
+		}
+		else SPI_SDA_1;
+		byte=byte<<1;	
+		SPI_SCK_1;		
+	}	
+	SPI_SCK_0;
+}
 
 void lv_mcu_spiSendData(uint8_t *pData, uint16_t Size)
 {
-	// while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
-	// HAL_SPI_Transmit(&hspi2, pData, Size, 1000);
+	SPI_CS_0;	// before send data
+	for (uint16_t i = 0; i < Size; i++)
+	{
+		SPI_SendByte(pData[i]);
+	}
+	SPI_CS_1;	// send data over
 }
 
 void lv_mcu_spiSendColor(uint8_t *pData, uint16_t Size)
 {
-	// while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
-	// HAL_SPI_Transmit_DMA(&hspi2, pData, Size);
+	SPI_CS_0;
+	for (uint16_t i = 0; i < Size; i++)
+	{
+		SPI_SendByte(pData[i]);
+	}
+	SPI_CS_1;
 }
 
 uint8_t lv_mcu_spiIsReady(void)
 {
-	// uint8_t isReady = HAL_SPI_GetState(&hspi2) == HAL_SPI_STATE_READY;
-	// return isReady;
-	return 0;
+	return 1;
 }
 
 void lv_mcu_spi_io_init(void)
