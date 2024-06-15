@@ -22,9 +22,9 @@
 /*====================
    COLOR SETTINGS
  *====================*/
-// add two define
-#define MY_DISP_HOR_RES 320
-#define MY_DISP_VER_RES 240
+// 水平和垂直分辨率
+#define MY_DISP_HOR_RES 240
+#define MY_DISP_VER_RES 320
 
 /*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
 #define LV_COLOR_DEPTH 16

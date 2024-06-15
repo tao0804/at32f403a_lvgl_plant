@@ -10,7 +10,7 @@
 #include "st7789.h"
 #include "lv_mcu_driver.h"
 #include "at32f403a_407_gpio.h"
-#include "at32f403a_407_board.h"
+#include "my_delay.h"
 
 /*********************
  *      DEFINES
@@ -18,8 +18,8 @@
 #define TAG "st7789"
 
 #define ST7789_USE_RST                (1)
-#define ST7789_INVERT_COLORS          (0)	// 反显
-#define CONFIG_LV_DISPLAY_ORIENTATION (1)
+#define ST7789_INVERT_COLORS          (0)	// tao:反显
+#define CONFIG_LV_DISPLAY_ORIENTATION (2)	// tao:0/1/2/3
 
 /**********************
  *      TYPEDEFS
@@ -92,14 +92,14 @@ void st7789_init(void)
 
 	// Initialize non-SPI GPIOs
 	// 外部已经初始化过了，这里不用再初始化GPIO
-	gpio_bits_set(ST7789_BL_PORT, ST7789_BL_PIN);   // 打开背光
+	LV_GPIO_SET(ST7789_BL_PORT, ST7789_BL_PIN);   // 打开背光
 
 	// Reset the display
 #if !defined(ST7789_SOFT_RST)
 	// Reset the display
-	gpio_bits_reset(ST7789_RST_PORT, ST7789_RST_PIN);
+	LV_GPIO_CLR(ST7789_RST_PORT, ST7789_RST_PIN);
 	delay_ms(100);
-	gpio_bits_set(ST7789_RST_PORT, ST7789_RST_PIN);
+	LV_GPIO_SET(ST7789_RST_PORT, ST7789_RST_PIN);
 	delay_ms(100);
 #else
 	st7789_send_cmd(ST7789_SWRESET);
@@ -192,23 +192,23 @@ void st7789_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_m
  **********************/
 static void st7789_send_cmd(uint8_t cmd)
 {
-	// while(!lv_mcu_spiIsReady());
-	// LV_GPIO_CLR(ST7789_DC_PORT, ST7789_DC_PIN); /*Command mode*/
-	// lv_mcu_spiSendData(&cmd, 1);
+	while(!lv_mcu_spiIsReady());
+	LV_GPIO_CLR(ST7789_DC_PORT, ST7789_DC_PIN); /*Command mode*/
+	lv_mcu_spiSendData(&cmd, 1);
 }
 
 static void st7789_send_data(void *data, uint16_t length)
 {
-	// while(!lv_mcu_spiIsReady());
-	// LV_GPIO_SET(ST7789_DC_PORT, ST7789_DC_PIN); /*Data mode*/
-	// lv_mcu_spiSendData(data, length);
+	while(!lv_mcu_spiIsReady());
+	LV_GPIO_SET(ST7789_DC_PORT, ST7789_DC_PIN); /*Data mode*/
+	lv_mcu_spiSendData(data, length);
 }
 
 static void st7789_send_color(void *data, size_t length)
 {
-	// while(!lv_mcu_spiIsReady());
-	// LV_GPIO_SET(ST7789_DC_PORT, ST7789_DC_PIN); /*Data mode*/
-	// lv_mcu_spiSendColor(data, length);
+	while(!lv_mcu_spiIsReady());
+	LV_GPIO_SET(ST7789_DC_PORT, ST7789_DC_PIN); /*Data mode*/
+	lv_mcu_spiSendColor(data, length);
 }
 
 static void st7789_set_orientation(uint8_t orientation)

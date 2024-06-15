@@ -86,7 +86,7 @@ void lv_port_disp_init(void)
 
     /* Example for 1) */
     static lv_disp_draw_buf_t draw_buf_dsc_1;
-    static lv_color_t buf_1[MY_DISP_HOR_RES * 10];                          /*A buffer for 10 rows*/
+    static lv_color_t buf_1[MY_DISP_HOR_RES * 10];	/*A buffer for 10 rows*/
     lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
 
     /* Example for 2) */
@@ -141,8 +141,8 @@ void lv_port_disp_init(void)
 static void disp_init(void)
 {
     /*You code here*/
-    st7789_init();
     lv_mcu_spi_io_init();
+    st7789_init();
 }
 
 volatile bool disp_flush_enabled = true;
@@ -169,22 +169,13 @@ void disp_disable_update(void)
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
     if(disp_flush_enabled) {
-        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
-
-        int32_t x;
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            for(x = area->x1; x <= area->x2; x++) {
-                /*Put a pixel to the display. For example:*/
-                /*put_px(x, y, *color_p)*/
-                st7789_flush(disp_drv, area, color_p);
-                color_p++;
-            }
-        }
+        // st7735s_flush(disp_drv, area, color_p);
+        st7789_flush(disp_drv, area, color_p);
     }
 
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
+    // 若DMA就放完成中断里
     lv_disp_flush_ready(disp_drv);
 }
 
