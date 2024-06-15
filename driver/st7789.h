@@ -17,28 +17,15 @@ extern "C" {
 #include <stdbool.h>
 #include "lvgl.h"
 
-// å°†main.hå®é™…ç”¨åˆ°çš„å†…å®¹æ”¾st7789.h,å–æ¶ˆ#include "main.h"
-// å®é™…LEDK1~4ä¸BLKç›¸è¿,ç›¸å…³å®åªåœ¨åŸå·¥ç¨‹main.cä½¿ç”¨,æ‰€ä»¥ç›´æ¥æ³¨é‡Š
-// #define LED0_Pin GPIO_PIN_9
-// #define LED0_GPIO_Port GPIOF
-// #define LED1_Pin GPIO_PIN_10
-// #define LED1_GPIO_Port GPIOF
-// è®¾ç½®RSTæ¥å£åˆ°PA11
-#define LCD_RES_Pin GPIO_PINS_11
-#define LCD_RES_GPIO_Port GPIOA
-// è®¾ç½®DCæ¥å£åˆ°PA9
-#define LCD_DC_Pin GPIO_PINS_9
-#define LCD_DC_GPIO_Port GPIOA
-// è®¾ç½®BLKæ¥å£åˆ°PB14
-#define LCD_BL_Pin GPIO_PINS_14
-#define LCD_BL_GPIO_Port GPIOB
+// ½«main.hÊµ¼ÊÓÃµ½µÄÄÚÈİ·Åst7789.h,È¡Ïû#include "main.h"
+// Êµ¼ÊLEDK1~4ÓëBLKÏàÁ¬,Ïà¹ØºêÖ»ÔÚÔ­¹¤³Ìmain.cÊ¹ÓÃ,ËùÒÔÖ±½Ó×¢ÊÍ
 
-#define ST7789_DC_PORT  LCD_DC_GPIO_Port
-#define ST7789_DC_PIN   LCD_DC_Pin
-#define ST7789_RST_PORT LCD_RES_GPIO_Port
-#define ST7789_RST_PIN  LCD_RES_Pin
-#define ST7789_BL_PORT  LCD_BL_GPIO_Port
-#define ST7789_BL_PIN   LCD_BL_Pin
+#define ST7789_DC_PORT  GPIOA
+#define ST7789_DC_PIN   GPIO_PINS_9
+#define ST7789_RST_PORT GPIOA
+#define ST7789_RST_PIN  GPIO_PINS_11
+#define ST7789_BL_PORT  GPIOB
+#define ST7789_BL_PIN   GPIO_PINS_14
 
 /* ST7789 commands */
 #define ST7789_NOP     0x00

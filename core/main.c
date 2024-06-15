@@ -7,8 +7,8 @@ int main(void)
 	system_clock_config();
 	delay_init();
 	delay_ms(500);
-	lv_init(); /* lvgl ç³»ç»Ÿåˆå§‹åŒ– */
-	lv_port_disp_init(); /* lvgl æ˜¾ç¤ºæ¥å£åˆå§‹åŒ–,æ”¾åœ¨ lv_init()çš„åé¢ */
+	lv_init(); /* lvgl ÏµÍ³³õÊ¼»¯ */
+	lv_port_disp_init(); /* lvgl ÏÔÊ¾½Ó¿Ú³õÊ¼»¯,·ÅÔÚ lv_init()µÄºóÃæ */
 	lv_obj_t *label = lv_label_create(lv_scr_act());
 	lv_label_set_text(label, "Hello LVGL  :- (");
 	lv_obj_center(label);
