@@ -14,8 +14,8 @@ static lv_obj_t *battery_pad, *battery_per;
 void my_gui_set_battery(uint8_t percent)
 {
     if (percent < 20){
-        // lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xff0000), 0);    // 电池小于20% 红色
-        lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xf800), 0);    // 电池小于20% 红色
+        lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xff0000), 0);    // 电池小于20% 红色
+        // lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xf800), 0);    // 电池小于20% 红色
     } else if (percent >= 20 && percent <= 100){
         lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xff00), 0);      // 20~100% 绿色
     } else {
@@ -78,15 +78,13 @@ static void my_gui_battery_init(void)
     my_gui_set_battery(100);
 }
 
-
-
 #define ARRAY_NUM(arr)			(sizeof(arr)/sizeof((arr)[0]))
 
 struct my_gui_config_value
 {
     uint16_t cfg_range;
-    uint16_t cfg_value;																									
-    char ** cfg_str;
+    uint16_t cfg_value;
+	char ** cfg_str;
 };
 
 char *cfg_freq[] = {"2430MHz", "2440MHz", "2450MHz"};

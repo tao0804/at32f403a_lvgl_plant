@@ -35,6 +35,8 @@ extern "C" {
 
 /* exported functions ------------------------------------------------------- */
 void system_clock_config(void);
+void tmr_clk_config(void);
+
 
 #ifdef __cplusplus
 }
