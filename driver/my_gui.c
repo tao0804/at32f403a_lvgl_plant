@@ -5,31 +5,25 @@
 static lv_obj_t *tabview;
 static lv_group_t *group1, *group2;
 static lv_obj_t *btn1, *btn2, *btn3, *btn4;
-static lv_obj_t * ta1;
+// static lv_obj_t * ta1;
+static lv_obj_t *battery_pad, *battery_per;
 
 #define  BATTERY_OUTLINE_W    40 //电池图标宽度
 #define  BATTERY_OUTLINE_H    20 //电池图标高度
 
-static void my_gui_battery_cb(void* p, int32_t v)
+void my_gui_set_battery(uint8_t percent)
 {
-    //实现变色效果，电池电量低于20% 红色
-    static int32_t cnt;
-    if (cnt >= BATTERY_OUTLINE_W * 0.2 && v < BATTERY_OUTLINE_W * 0.2)
-    {
-        lv_obj_set_style_bg_color(p, lv_color_hex(0xff0000), 0);
+    if (percent < 20){
+        // lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xff0000), 0);    // 电池小于20% 红色
+        lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xf800), 0);    // 电池小于20% 红色
+    } else if (percent >= 20 && percent <= 100){
+        lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xff00), 0);      // 20~100% 绿色
+    } else {
+        return;
     }
-    else if (v >= BATTERY_OUTLINE_W * 0.2 && cnt < BATTERY_OUTLINE_W * 0.2)
-    {
-        lv_obj_set_style_bg_color(p, lv_color_hex(0xff00), 0);
-    }
-    cnt = v;
 
-    //修改电量颜色obj宽度
-    lv_obj_set_width(p, v);
-
-    //修改电池百分比
-    lv_obj_t *text = lv_obj_get_child(lv_obj_get_parent(p), -1);
-    lv_label_set_text_fmt(text, "%d", v*100/(BATTERY_OUTLINE_W-4));
+    lv_obj_set_width(battery_pad, BATTERY_OUTLINE_W * percent / 100);     // 修改电量pad宽度
+    lv_label_set_text_fmt(battery_per, "%d", percent);                    //修改电池百分比
 }
 
 static void my_gui_battery_init(void)
@@ -53,81 +47,51 @@ static void my_gui_battery_init(void)
     lv_obj_align(outline, LV_ALIGN_CENTER, 0, 0);
 
     //电池电量填充obj
-    lv_obj_t* pad = lv_obj_create(outline);
-
+    battery_pad = lv_obj_create(outline);
 
     //设置outline
-    lv_obj_set_style_outline_width(pad, 0, 0);
-    lv_obj_set_style_outline_pad(pad, 0, 0);
-    lv_obj_set_style_border_width(pad, 0, 0);
+    lv_obj_set_style_outline_width(battery_pad, 0, 0);
+    lv_obj_set_style_outline_pad(battery_pad, 0, 0);
+    lv_obj_set_style_border_width(battery_pad, 0, 0);
+
     //设置背景色
-    lv_obj_set_style_bg_color(pad, lv_color_hex(0xff0000), 0);
+    //lv_obj_set_style_bg_color(battery_pad, lv_color_hex(0xff0000), 0);  // 是红色吗？为什么是RGB888，先注释掉，最后调my_gui_set_battery去设置值和填充颜色
 
     //设置宽高
-    lv_obj_set_size(pad, BATTERY_OUTLINE_W, BATTERY_OUTLINE_H-4);
-    lv_obj_set_style_border_width(pad, 0, 0);
+    lv_obj_set_size(battery_pad, BATTERY_OUTLINE_W, BATTERY_OUTLINE_H-4);
+    lv_obj_set_style_border_width(battery_pad, 0, 0);
 
     //设置圆角
-    lv_obj_set_style_radius(pad, 8, 0);
+    lv_obj_set_style_radius(battery_pad, 8, 0);
 
     //右上显示
     lv_obj_align(outline, LV_ALIGN_TOP_RIGHT, 0, 0);
 
     //关闭滚动条
-    lv_obj_clear_flag(pad, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(battery_pad, LV_OBJ_FLAG_SCROLLABLE);
 
     //电池百分比
-    lv_obj_t* label = lv_label_create(outline);
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    battery_per = lv_label_create(outline);
+    lv_obj_align(battery_per, LV_ALIGN_CENTER, 0, 0);
 
-    //设置动画， 模仿电池电量变化
-    lv_anim_t a;
-    lv_anim_init(&a);
-
-    /*Set the "animator" function*/
-    lv_anim_set_exec_cb(&a, my_gui_battery_cb);
-
-    /*Set the "animator" function*/
-    lv_anim_set_var(&a, pad);
-
-    /*Length of the animation [ms]*/
-    lv_anim_set_time(&a, 10000);
-
-    /*Set start and end values. E.g. 0, 150*/
-    lv_anim_set_values(&a, 0, BATTERY_OUTLINE_W-4);
-
-    /*Time to wait before starting the animation [ms]*/
-    lv_anim_set_delay(&a, 1000);
-
-    /*Play the animation backward too with this duration. Default is 0 (disabled) [ms]*/
-    lv_anim_set_playback_time(&a, 0);
-
-    /*Delay before playback. Default is 0 (disabled) [ms]*/
-    lv_anim_set_playback_delay(&a, 0);
-
-    /*Number of repetitions. Default is 1.  LV_ANIM_REPEAT_INFINIT for infinite repetition*/
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-
-    /*Delay before repeat. Default is 0 (disabled) [ms]*/
-    lv_anim_set_repeat_delay(&a, 1000);
-
-    /* START THE ANIMATION
-     *------------------*/
-    lv_anim_start(&a);                             /*Start the animation*/
+    // 默认100%
+    my_gui_set_battery(100);
 }
+
+
 
 #define ARRAY_NUM(arr)			(sizeof(arr)/sizeof((arr)[0]))
 
 struct my_gui_config_value
 {
     uint16_t cfg_range;
-    uint16_t cfg_value;
+    uint16_t cfg_value;																									
     char ** cfg_str;
 };
 
 char *cfg_freq[] = {"2430MHz", "2440MHz", "2450MHz"};
 char *cfg_rate[] = {"100Kbps","500Kbps","1Mbps"};
-char *cfg_percent[] = {"0\%", "10\%", "20\%", "30\%", "40\%", "50\%", "60\%", "70\%", "80\%", "90\%", "100\%"};
+char *cfg_percent[] = {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"};
 
 static void my_gui_btn_cb(lv_event_t * e)
 {
@@ -165,7 +129,7 @@ static void my_gui_set_group(lv_group_t *g)
         lv_group_add_obj(group1, btn2);
         lv_group_add_obj(group1, btn3);
         lv_group_add_obj(group1, btn4);
-        lv_group_add_obj(group1, ta1);
+        // lv_group_add_obj(group1, ta1);
         // lv_indev_set_group(lv_win32_keypad_device_object, group1);     // 将键盘和组1关联
     } else if (g == group2) {
         lv_group_remove_all_objs(group2);
@@ -208,14 +172,14 @@ static void my_gui_tv_cb(lv_event_t * e)
     } else {
         my_gui_set_group(group2);
     }
-    lv_tabview_set_act((lv_obj_t *)tv, act_id, LV_ANIM_OFF);    // 设置完group后再切，否则存在问题，不能开启动画，否则动画帧有focus问题
+    // lv_tabview_set_act((lv_obj_t *)tv, act_id, LV_ANIM_OFF);    // 设置完group后再切，否则存在问题，不能开启动画，否则动画帧有focus问题
 }
 
-static void textarea_event_handler(lv_event_t * e)
-{
-    lv_obj_t * ta = lv_event_get_target(e);
-    LV_LOG_USER("Enter was pressed. The current text is: %s", lv_textarea_get_text(ta));
-}
+// static void textarea_event_handler(lv_event_t * e)
+// {
+//     lv_obj_t * ta = lv_event_get_target(e);
+//     LV_LOG_USER("Enter was pressed. The current text is: %s", lv_textarea_get_text(ta));
+// }
 
 static void my_gui_tabview_init(void)
 {
@@ -257,14 +221,14 @@ static void my_gui_tabview_init(void)
     lv_obj_add_event_cb(btn4, my_gui_btn_cb, LV_EVENT_KEY, NULL);
 
     // 创建textarea
-    lv_obj_t *  btn5 = lv_list_add_btn(list1, NULL, "Code:");
-    ta1 = lv_textarea_create(btn5);
-    lv_textarea_set_one_line(ta1, true);
-    lv_textarea_set_accepted_chars(ta1, "0123456789");   // 设置仅接受数字字符
-    lv_obj_align(ta1, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_width(ta1, 100);
-    lv_obj_add_event_cb(ta1, textarea_event_handler, LV_EVENT_READY, NULL);
-    lv_obj_clear_state(ta1, LV_STATE_FOCUSED);
+    // lv_obj_t *  btn5 = lv_list_add_btn(list1, NULL, "Code:");
+    // ta1 = lv_textarea_create(btn5);
+    // lv_textarea_set_one_line(ta1, true);
+    // lv_textarea_set_accepted_chars(ta1, "0123456789");   // 设置仅接受数字字符
+    // lv_obj_align(ta1, LV_ALIGN_CENTER, 0, 0);
+    // lv_obj_set_width(ta1, 100);
+    // lv_obj_add_event_cb(ta1, textarea_event_handler, LV_EVENT_READY, NULL);
+    // lv_obj_clear_state(ta1, LV_STATE_FOCUSED);
 
     // 创建group
     group1 = lv_group_create();

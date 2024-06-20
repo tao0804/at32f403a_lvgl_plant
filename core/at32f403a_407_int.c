@@ -137,3 +137,15 @@ void SysTick_Handler(void)
 /**
   * @}
   */
+
+/** @addtogroup 403A_TMR_timer_base TMR_timer_base
+  * @{
+*/
+void TMR7_GLOBAL_IRQHandler(void)
+{
+	if (tmr_flag_get(TMR7, TMR_OVF_FLAG) != RESET) {
+		/* add user code... */
+		lv_tick_inc(1); /*lvglµÄ1msÐÄÌø*/
+		tmr_flag_clear(TMR7, TMR_OVF_FLAG);
+	}
+}
