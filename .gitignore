@@ -2,6 +2,6 @@
 /build/*
 *.jdebug*
 /.vscode/*
-/user/
-!*.uvoptx
-!*.uvprojx
+/user/*
+!/user/*.uvoptx
+!/user/*.uvprojx
