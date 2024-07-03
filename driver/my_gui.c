@@ -1,6 +1,6 @@
 #include "my_gui.h"
 #include "lvgl.h"
-// #include "lv_drivers/win32drv/win32drv.h"
+#include "lv_port_indev.h"
 
 static lv_obj_t *tabview;
 static lv_group_t *group1, *group2;
@@ -25,6 +25,8 @@ void my_gui_set_battery(uint8_t percent)
     lv_obj_set_width(battery_pad, BATTERY_OUTLINE_W * percent / 100);     // 修改电量pad宽度
     lv_label_set_text_fmt(battery_per, "%d", percent);                    //修改电池百分比
 }
+
+
 
 static void my_gui_battery_init(void)
 {
@@ -128,11 +130,11 @@ static void my_gui_set_group(lv_group_t *g)
         lv_group_add_obj(group1, btn3);
         lv_group_add_obj(group1, btn4);
         // lv_group_add_obj(group1, ta1);
-        // lv_indev_set_group(lv_win32_keypad_device_object, group1);     // 将键盘和组1关联
+        lv_indev_set_group(indev_keypad, group1);     // 将键盘和组1关联
     } else if (g == group2) {
         lv_group_remove_all_objs(group2);
         lv_group_add_obj(group2, lv_tabview_get_tab_btns(tabview));
-        // lv_indev_set_group(lv_win32_keypad_device_object, group2);     // 将键盘和组2关联
+        lv_indev_set_group(indev_keypad, group2);     // 将键盘和组2关联
     }
 }
 
@@ -170,7 +172,7 @@ static void my_gui_tv_cb(lv_event_t * e)
     } else {
         my_gui_set_group(group2);
     }
-    // lv_tabview_set_act((lv_obj_t *)tv, act_id, LV_ANIM_OFF);    // 设置完group后再切，否则存在问题，不能开启动画，否则动画帧有focus问题
+    lv_tabview_set_act((lv_obj_t *)tv, act_id, LV_ANIM_OFF);    // 设置完group后再切，否则存在问题，不能开启动画，否则动画帧有focus问题
 }
 
 // static void textarea_event_handler(lv_event_t * e)

@@ -9,8 +9,10 @@
 	/*********************
 	 *      INCLUDES
 	 *********************/
-	#include "lv_port_indev.h"
-	#include "lvgl.h"
+#include "lv_port_indev.h"
+#include "lvgl.h"
+#include "key.h"
+#include "app_key.h"
 
 /*********************
  *      DEFINES
@@ -26,7 +28,7 @@
 
 static void keypad_init(void);
 static void keypad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data);
-static uint32_t keypad_get_key(void);
+// static uint32_t keypad_get_key(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,55 +63,55 @@ void lv_port_indev_init(void)
 static void keypad_init(void)
 {
 	/*Your code comes here*/
+	KEY_Init();
+	TIM2_Init();
 }
+
+volatile lv_indev_data_t test;
 
 /*Will be called by the library to read the mouse*/
 static void keypad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-	static uint32_t last_key = 0;
-
 	/*Get the current x and y coordinates*/
-	mouse_get_xy(&data->point.x, &data->point.y);
+	// mouse_get_xy(&data->point.x, &data->point.y);
 
 	/*Get whether the a key is pressed and save the pressed key*/
-	uint32_t act_key = keypad_get_key();
-	if (act_key != 0) {
+	uint8_t act_key = key_readCont();
+	if (act_key != KEY_NONE) {
 		data->state = LV_INDEV_STATE_PR;
 
 		/*Translate the keys to LVGL control characters according to your key definitions*/
 		switch (act_key) {
-		case 1:
+		case KEY_DOWN:
 			act_key = LV_KEY_NEXT;
 			break;
-		case 2:
+		case KEY_UP:
 			act_key = LV_KEY_PREV;
 			break;
-		case 3:
+		case KEY_LEFT:
 			act_key = LV_KEY_LEFT;
 			break;
-		case 4:
+		case KEY_RIGHT:
 			act_key = LV_KEY_RIGHT;
 			break;
-		case 5:
+		case KEY_ENTER:
 			act_key = LV_KEY_ENTER;
 			break;
 		}
-
-		last_key = act_key;
 	} else {
 		data->state = LV_INDEV_STATE_REL;
 	}
 
-	data->key = last_key;
+	data->key = act_key;
+	test = *data;
 }
 
 /*Get the currently being pressed key.  0 if no key is pressed*/
-static uint32_t keypad_get_key(void)
-{
-	/*Your code comes here*/
-
-	return 0;
-}
+// static uint32_t keypad_get_key(void)
+// {
+// 	/*Your code comes here*/
+// 	return 0;
+// }
 
 #else /*Enable this file at the top*/
 

@@ -14,6 +14,7 @@
  * </table>
  */
 #include "key.h"
+#include "app_key.h"
 
 static void KEY_scan_do(void);
 static uint8_t KEY_scan_result(void);
@@ -151,67 +152,67 @@ uint8_t KEY_scan_result(void)
 
 static void KEY_change_param(u8 dir)
 {
-	u8 page_abs_index;
-	sys_param_t *p_sys_param;
-	rf_table_t *p_rf_table;
+//	u8 page_abs_index;
+//	sys_param_t *p_sys_param;
+//	rf_table_t *p_rf_table;
 
-	p_sys_param = get_sys_param();
-	p_rf_table = get_rf_table(p_sys_param->module_type);
-	page_abs_index = p_sys_param->page_index % SHOW_PAGE_MAX;
+//	p_sys_param = get_sys_param();
+//	p_rf_table = get_rf_table(p_sys_param->module_type);
+//	page_abs_index = p_sys_param->page_index % SHOW_PAGE_MAX;
 
-	switch (p_sys_param->screen_index) {
-	case 0:
-		break;
+//	switch (p_sys_param->screen_index) {
+//	case 0:
+//		break;
 
-	default:
-		break;
-	}
+//	default:
+//		break;
+//	}
 }
 
 uint8_t APP_KEY_Scan(void)
 {
 	uint8_t key_index;
-	sys_param_t *p_sys_param;
-	p_sys_param = get_sys_param();
+//	sys_param_t *p_sys_param;
+//	p_sys_param = get_sys_param();
 
 	key_index = KEY_scan_result();
-	switch (key_index) {
-	case KEY_UP:
-		if (p_sys_param->page_selected == 1 && p_sys_param->screen_index == 0) {
-			p_sys_param->page_index--;
-			p_sys_param->page_index %= 8;
-			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
-		} else {
-			p_sys_param->page_index -= SHOW_PAGE_MAX;
-			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
-		}
-		break;
-	case KEY_DOWN:
-		if (p_sys_param->page_selected == 1 && p_sys_param->screen_index == 0) {
-			p_sys_param->page_index++;
-			p_sys_param->page_index %= 8;
-			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
-		} else {
-			p_sys_param->page_index += SHOW_PAGE_MAX;
-			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
-		}
-		break;
-	case KEY_LEFT:
-		if (p_sys_param->page_selected)
-			KEY_change_param(0);
-		break;
-	case KEY_RIGHT:
-		if (p_sys_param->page_selected)
-			KEY_change_param(1);
-		break;
-	case KEY_ENTER:
-		if (p_sys_param->screen_index == 0) {
-			p_sys_param->page_selected = p_sys_param->page_selected ^ 0x01;
-			//							if (!p_sys_param->page_selected)
-			//									RF_Init();	//确认修改后重新初始化RF
-		}
-		break;
-	}
+//	switch (key_index) {
+//	case KEY_UP:
+//		if (p_sys_param->page_selected == 1 && p_sys_param->screen_index == 0) {
+//			p_sys_param->page_index--;
+//			p_sys_param->page_index %= 8;
+//			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
+//		} else {
+//			p_sys_param->page_index -= SHOW_PAGE_MAX;
+//			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
+//		}
+//		break;
+//	case KEY_DOWN:
+//		if (p_sys_param->page_selected == 1 && p_sys_param->screen_index == 0) {
+//			p_sys_param->page_index++;
+//			p_sys_param->page_index %= 8;
+//			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
+//		} else {
+//			p_sys_param->page_index += SHOW_PAGE_MAX;
+//			p_sys_param->screen_index = (p_sys_param->page_index / SHOW_PAGE_MAX) % SHOW_SCREEN_MAX;
+//		}
+//		break;
+//	case KEY_LEFT:
+//		if (p_sys_param->page_selected)
+//			KEY_change_param(0);
+//		break;
+//	case KEY_RIGHT:
+//		if (p_sys_param->page_selected)
+//			KEY_change_param(1);
+//		break;
+//	case KEY_ENTER:
+//		if (p_sys_param->screen_index == 0) {
+//			p_sys_param->page_selected = p_sys_param->page_selected ^ 0x01;
+//			//							if (!p_sys_param->page_selected)
+//			//									RF_Init();	//确认修改后重新初始化RF
+//		}
+//		break;
+//	}
 	return key_index;
 }
 
@@ -220,7 +221,7 @@ void TMR2_GLOBAL_IRQHandler(void)
 {
 	if (tmr_flag_get(TMR2, TMR_OVF_FLAG) != RESET) {
 		tmr_flag_clear(TMR2, TMR_OVF_FLAG);
-		Systim_Count++;
+		// Systim_Count++;
 
 		Key_Index = KEY_scan_result();
 	}
@@ -262,4 +263,14 @@ void TIM2_Init(void)
 void KET_Timeout(void *p)
 {
 	Key_Index = APP_KEY_Scan();
+}
+
+uint8_t key_readCont(void)
+{
+	uint8_t i;
+	for (i = 0; i < KEY_MAX; i++) {
+		if (key_status[i].cont)
+			return i;
+	}
+	return KEY_NONE;
 }

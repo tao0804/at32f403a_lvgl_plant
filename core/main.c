@@ -1,5 +1,6 @@
 #include "my_delay.h"
 #include "at32f403a_407_clock.h"
+#include "lv_port_indev.h"
 #include "lv_port_disp.h"
 
 #include <stdlib.h>
@@ -16,7 +17,7 @@ int main(void)
 	delay_ms(500);
 	lv_init(); /* lvgl 系统初始化 */
 	lv_port_disp_init(); /* lvgl 显示接口初始化,放在 lv_init()的后面 */
-	lv_port_indev_init();
+	lv_port_indev_init();	// 增加按键和时钟初始化
 	LV_LOG_USER("LVGL initialization completed!");
 
 	/*Run the demo*/
@@ -26,7 +27,7 @@ int main(void)
 		/* Periodically call the lv_task handler.
 		 * It could be done in a timer interrupt or an OS task too.*/
 		lv_task_handler();
-		delay_ms(10);       /*Just to let the system breath*/
+		//delay_ms(10);       /*Just to let the system breath*/
 	}
 	return 0;
 }

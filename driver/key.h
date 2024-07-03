@@ -30,7 +30,7 @@ typedef struct
 	u8 key_name;
 	u8 triger;	// 按键触发
 	u8 cont;	// 持续按下
-} key_status_t;
+}key_status_t;
 
 enum {
 	KEY_UP,
@@ -41,7 +41,7 @@ enum {
 	KEY_SEND,
 
 	KEY_MAX,
-	KEY_NONE
+	KEY_NONE,
 };
 
 #endif
