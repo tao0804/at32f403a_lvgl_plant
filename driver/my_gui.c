@@ -82,10 +82,14 @@ static void my_gui_battery_init(void)
 
 #define ARRAY_NUM(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+typedef void(*void_u16_func_ptr_type)(uint16_t);
+
 struct my_gui_config_value {
 	uint16_t cfg_range;
-	uint16_t cfg_value;
+	uint16_t show_value;
+	uint16_t save_value;	// 保存值
 	char **cfg_str;
+    void_u16_func_ptr_type cfg_update_inform_cb;	// 用作交互
 };
 
 char *cfg_freq[] = {"2430MHz", "2440MHz", "2450MHz"};
@@ -97,26 +101,39 @@ static void my_gui_btn_cb(lv_event_t *e)
 	lv_event_code_t event_code = lv_event_get_code(e);
 	lv_obj_t *btn = lv_event_get_target(e);
 	uint32_t key = *(uint32_t *)lv_event_get_param(e);
-	lv_obj_t *label = lv_obj_get_user_data(btn);                      // 获取label对象
+	lv_obj_t *label = lv_obj_get_user_data(btn);	// 获取label对象
 	struct my_gui_config_value *cfg = lv_obj_get_user_data(label);    // 获取cfg
 
-	if (event_code != LV_EVENT_KEY) {
-		return;    // 本回调只处理KEY事件
+	if(event_code == LV_EVENT_KEY){
+		if (key == LV_KEY_RIGHT) {
+			// 增大配置项
+			if (cfg->show_value + 1 < cfg->cfg_range) {
+				cfg->show_value++;
+				lv_label_set_text(label, cfg->cfg_str[cfg->show_value]);
+			}
+		} else if (key == LV_KEY_LEFT) {
+			// 减小配置项
+			if (cfg->show_value > 0) {
+				cfg->show_value--;
+				lv_label_set_text(label, cfg->cfg_str[cfg->show_value]);
+			}
+		} else if (key == LV_KEY_ENTER) {
+			if (cfg->save_value != cfg->show_value) {
+				cfg->save_value = cfg->show_value;	// 保存配置
+				// 回调其他模块代码更新配置状态
+				if(cfg->cfg_update_inform_cb != NULL){
+					cfg->cfg_update_inform_cb(cfg->save_value);
+				}
+			}
+		}
+	}
+	else if(event_code == LV_EVENT_DEFOCUSED){
+		if (cfg->save_value != cfg->show_value) {
+			cfg->show_value = cfg->save_value;	// 恢复配置
+			lv_label_set_text(label, cfg->cfg_str[cfg->show_value]);
+		}
 	}
 
-	if (key == LV_KEY_RIGHT) {
-		// 增大配置项
-		if (cfg->cfg_value + 1 < cfg->cfg_range) {
-			cfg->cfg_value++;
-			lv_label_set_text(label, cfg->cfg_str[cfg->cfg_value]);
-		}
-	} else if (key == LV_KEY_LEFT) {
-		// 减小配置项
-		if (cfg->cfg_value > 0) {
-			cfg->cfg_value--;
-			lv_label_set_text(label, cfg->cfg_str[cfg->cfg_value]);
-		}
-	}
 }
 
 static void my_gui_set_group(lv_group_t *g)
@@ -129,7 +146,7 @@ static void my_gui_set_group(lv_group_t *g)
 		lv_group_add_obj(group1, btn3);
 		lv_group_add_obj(group1, btn4);
 		// lv_group_add_obj(group1, ta1);
-		lv_indev_set_group(indev_keypad, group1)	// 将键盘和组1关联
+		lv_indev_set_group(indev_keypad, group1);	// 将键盘和组1关联
 	} else if (g == group2) {
 		lv_group_remove_all_objs(group2);
 		lv_group_add_obj(group2, lv_tabview_get_tab_btns(tabview));
@@ -209,15 +226,19 @@ static void my_gui_tabview_init(void)
 	// 创建按键
 	btn1 = lv_list_add_btn(list1, NULL, "Freq:");
 	lv_obj_add_event_cb(btn1, my_gui_btn_cb, LV_EVENT_KEY, NULL);
+	lv_obj_add_event_cb(btn1, my_gui_btn_cb, LV_EVENT_DEFOCUSED, NULL);
 
 	btn2 = lv_list_add_btn(list1, NULL, "Rate:");
 	lv_obj_add_event_cb(btn2, my_gui_btn_cb, LV_EVENT_KEY, NULL);
+	lv_obj_add_event_cb(btn2, my_gui_btn_cb, LV_EVENT_DEFOCUSED, NULL);
 
 	btn3 = lv_list_add_btn(list1, NULL, "Volume:");
 	lv_obj_add_event_cb(btn3, my_gui_btn_cb, LV_EVENT_KEY, NULL);
+	lv_obj_add_event_cb(btn3, my_gui_btn_cb, LV_EVENT_DEFOCUSED, NULL);
 
 	btn4 = lv_list_add_btn(list1, NULL, "Brightness:");
 	lv_obj_add_event_cb(btn4, my_gui_btn_cb, LV_EVENT_KEY, NULL);
+	lv_obj_add_event_cb(btn4, my_gui_btn_cb, LV_EVENT_DEFOCUSED, NULL);
 
 	// 创建textarea
 	// lv_obj_t *  btn5 = lv_list_add_btn(list1, NULL, "Code:");
@@ -239,36 +260,36 @@ static void my_gui_tabview_init(void)
 
 	// 创建config值 label
 	static lv_obj_t *label1;
-	static struct my_gui_config_value cfg1 = {.cfg_range = ARRAY_NUM(cfg_freq), .cfg_value = 1, cfg_freq};
+	static struct my_gui_config_value cfg1 = {.cfg_range = ARRAY_NUM(cfg_freq), .save_value = 1, .show_value = 1, .cfg_str = cfg_freq, .cfg_update_inform_cb = NULL};
 	label1 = lv_label_create(btn1);
-	lv_label_set_text(label1, cfg1.cfg_str[cfg1.cfg_value]);
+	lv_label_set_text(label1, cfg1.cfg_str[cfg1.show_value]);
 	lv_label_set_long_mode(label1, LV_LABEL_LONG_SCROLL_CIRCULAR);
 	lv_obj_set_flex_grow(label1, 1);
 	lv_obj_set_user_data(btn1, label1);     // 将label对象关联到btn对象，减少全局变量使用
 	lv_obj_set_user_data(label1, &cfg1);    // 将cfg数据关联到label对象，减少全局变量使用
 
 	static lv_obj_t *label2;
-	static struct my_gui_config_value cfg2 = {.cfg_range = ARRAY_NUM(cfg_rate), .cfg_value = 1, cfg_rate};
+	static struct my_gui_config_value cfg2 = {.cfg_range = ARRAY_NUM(cfg_rate), .save_value = 1, .show_value = 1, .cfg_str = cfg_rate, .cfg_update_inform_cb = NULL};
 	label2 = lv_label_create(btn2);
-	lv_label_set_text(label2, cfg2.cfg_str[cfg2.cfg_value]);
+	lv_label_set_text(label2, cfg2.cfg_str[cfg2.show_value]);
 	lv_label_set_long_mode(label2, LV_LABEL_LONG_SCROLL_CIRCULAR);
 	lv_obj_set_flex_grow(label2, 1);
 	lv_obj_set_user_data(btn2, label2);
 	lv_obj_set_user_data(label2, &cfg2);
 
 	static lv_obj_t *label3;
-	static struct my_gui_config_value cfg3 = {.cfg_range = ARRAY_NUM(cfg_percent), .cfg_value = 5, cfg_percent};
+	static struct my_gui_config_value cfg3 = {.cfg_range = ARRAY_NUM(cfg_percent), .save_value = 5, .show_value = 5, .cfg_str = cfg_percent, .cfg_update_inform_cb = NULL};
 	label3 = lv_label_create(btn3);
-	lv_label_set_text(label3, cfg3.cfg_str[cfg3.cfg_value]);
+	lv_label_set_text(label3, cfg3.cfg_str[cfg3.show_value]);
 	lv_label_set_long_mode(label3, LV_LABEL_LONG_SCROLL_CIRCULAR);
 	lv_obj_set_flex_grow(label3, 1);
 	lv_obj_set_user_data(btn3, label3);
 	lv_obj_set_user_data(label3, &cfg3);
 
 	static lv_obj_t *label4;
-	static struct my_gui_config_value cfg4 = {.cfg_range = ARRAY_NUM(cfg_percent), .cfg_value = 5, cfg_percent};
+	static struct my_gui_config_value cfg4 = {.cfg_range = ARRAY_NUM(cfg_percent), .save_value = 5, .show_value = 5, .cfg_str = cfg_percent, .cfg_update_inform_cb = NULL};
 	label4 = lv_label_create(btn4);
-	lv_label_set_text(label4, cfg4.cfg_str[cfg4.cfg_value]);
+	lv_label_set_text(label4, cfg4.cfg_str[cfg4.show_value]);
 	lv_label_set_long_mode(label4, LV_LABEL_LONG_SCROLL_CIRCULAR);
 	lv_obj_set_flex_grow(label4, 1);
 	lv_obj_set_user_data(btn4, label4);
