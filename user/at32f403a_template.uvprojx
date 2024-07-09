@@ -1415,6 +1415,21 @@
               <FileType>1</FileType>
               <FilePath>..\driver\my_gui.c</FilePath>
             </File>
+            <File>
+              <FileName>app_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\app_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_port_disp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\lv_port_disp.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_port_indev.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\lv_port_indev.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
