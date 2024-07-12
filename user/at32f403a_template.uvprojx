@@ -338,7 +338,7 @@
               <MiscControls>--diag_suppress=188,546,68,111</MiscControls>
               <Define>AT32F403AVGT7,USE_STDPERIPH_DRIVER,AT_START_F403A_V1</Define>
               <Undefine></Undefine>
-              <IncludePath>..\mcu\inc;..\core\cmsis\cm4\core_support;..\core\cmsis\cm4\device_support;..\lvgl;..\lvgl\src;..\lvgl\examples\porting;..\driver;..\core</IncludePath>
+              <IncludePath>..\mcu\inc;..\core\cmsis\cm4\core_support;..\core\cmsis\cm4\device_support;..\lvgl;..\lvgl\src;..\lvgl\examples\porting;..\driver;..\core;..\lvgl\src\core;..\lvgl\src\misc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

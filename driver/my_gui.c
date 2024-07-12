@@ -1,8 +1,13 @@
 #include "my_gui.h"
 #include "lvgl.h"
 #include "lv_port_indev.h"
+#include <stdio.h>
+#include "lv_refr.h"
+#include "lv_timer.h"
 
 static lv_obj_t *tabview;
+static lv_obj_t *table;
+static int16_t g_param1, g_param2, g_param3;
 static lv_group_t *group1, *group2;
 static lv_obj_t *btn1, *btn2, *btn3, *btn4;
 // static lv_obj_t * ta1;
@@ -91,6 +96,7 @@ struct my_gui_config_value {
 	char **cfg_str;
     void_u16_func_ptr_type cfg_update_inform_cb;	// 用作交互
 };
+
 
 char *cfg_freq[] = {"2430MHz", "2440MHz", "2450MHz"};
 char *cfg_rate[] = {"100Kbps", "500Kbps", "1Mbps"};
@@ -302,14 +308,18 @@ static void my_gui_tabview_init(void)
 	lv_obj_set_scrollbar_mode(tab2, LV_SCROLLBAR_MODE_OFF);
 
 	/*Add content to the tab2*/
-	lv_obj_t *table = lv_table_create(tab2);
+	table = lv_table_create(tab2);
+	char str[10];
 	lv_group_remove_obj(table);    // 不分配group
 	lv_table_set_cell_value(table, 0, 0, "ISSI");
-	lv_table_set_cell_value(table, 0, 1, "0db");
+	snprintf(str, sizeof(str), "%d dB", 0);
+	lv_table_set_cell_value(table, 0, 1, str);
 	lv_table_set_cell_value(table, 1, 0, "TXCnt");
-	lv_table_set_cell_value(table, 1, 1, "0");
+	snprintf(str, sizeof(str), "%d", 0);
+	lv_table_set_cell_value(table, 1, 1, str);
 	lv_table_set_cell_value(table, 2, 0, "RXCnt");
-	lv_table_set_cell_value(table, 2, 1, "0");
+	snprintf(str, sizeof(str), "%d", 0);
+	lv_table_set_cell_value(table, 2, 1, str);
 
 	/*Set a smaller height to the table. It'll make it scrollable*/
 	lv_table_set_col_width(table, 0, 105);
@@ -330,8 +340,47 @@ static void my_gui_tabview_init(void)
 #endif
 }
 
+static int16_t get_issi_globalparam()
+{
+	g_param1 = -70;
+	return g_param1;
+}
+static int16_t get_txcnt_globalparam()
+{
+	g_param2 = 10;
+	return g_param2;
+}
+static int16_t get_rxcnt_globalparam()
+{
+	g_param3 = 8;
+	return g_param3;
+}
+
+// 定时器回调函数
+static void refresh_screen_cb(lv_timer_t * timer) {
+	if(lv_tabview_get_tab_act(tabview) == 1){
+		// 刷新屏幕
+		// lv_refr_now(NULL); // 刷新整个屏幕
+		// 或者刷新特定对象
+		// lv_obj_invalidate(table);
+		char str[10];
+		snprintf(str, sizeof(str), "%d dB", get_issi_globalparam());
+		lv_table_set_cell_value(table, 0, 1, str);
+		snprintf(str, sizeof(str), "%d", get_txcnt_globalparam());
+		lv_table_set_cell_value(table, 1, 1, str);
+		snprintf(str, sizeof(str), "%d", get_rxcnt_globalparam());
+		lv_table_set_cell_value(table, 2, 1, str);
+	}
+}
+
+static void create_screen_refresh_timer() {
+	// 创建定时器,300ms 刷新一次
+	lv_timer_create(refresh_screen_cb, 300, NULL);
+}
+
 void my_gui_init(void)
 {
 	my_gui_tabview_init();
 	my_gui_battery_init();
+	create_screen_refresh_timer();
 }

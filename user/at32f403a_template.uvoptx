@@ -135,7 +135,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>	</Name>
+          <Name>d</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -159,6 +159,11 @@
           <count>1</count>
           <WinNumber>1</WinNumber>
           <ItemText>test</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>label,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -216,7 +221,7 @@
 
   <Group>
     <GroupName>core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -600,7 +605,7 @@
 
   <Group>
     <GroupName>lvgl</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -764,7 +769,7 @@
       <GroupNumber>4</GroupNumber>
       <FileNumber>44</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\lvgl\src\core\lv_refr.c</PathWithFileName>
